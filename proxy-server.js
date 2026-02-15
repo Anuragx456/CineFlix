@@ -4,7 +4,15 @@ const fs = require("fs");
 
 // Read API key from .env file
 const envContent = fs.readFileSync(".env", "utf8");
-const API_KEY = envContent.split("=").slice(1).join("=").trim();
+const envLines = envContent.split("\n");
+const apiKeyLine = envLines.find((line) =>
+  line.startsWith("EXPO_PUBLIC_MOVIE_API_KEY="),
+);
+if (!apiKeyLine) {
+  console.error("ERROR: EXPO_PUBLIC_MOVIE_API_KEY not found in .env file!");
+  process.exit(1);
+}
+const API_KEY = apiKeyLine.split("=").slice(1).join("=").trim();
 
 const PORT = 3001;
 

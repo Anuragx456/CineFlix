@@ -1,22 +1,6 @@
-import Constants from "expo-constants";
-
 const API_KEY = process.env.EXPO_PUBLIC_MOVIE_API_KEY;
 
-// In dev mode, route through local proxy since the phone may not reach external APIs directly
-const getBaseUrl = (): string => {
-  if (__DEV__) {
-    const hostUri = Constants.expoConfig?.hostUri; // e.g. "192.168.1.5:8081"
-    if (hostUri) {
-      const hostIp = hostUri.split(":")[0];
-      const proxyUrl = `http://${hostIp}:3001`;
-      console.log("Using local proxy:", proxyUrl);
-      return proxyUrl;
-    }
-  }
-  return "https://api.themoviedb.org/3";
-};
-
-const BASE_URL = getBaseUrl();
+const BASE_URL = "https://api.themoviedb.org/3";
 
 export const TMDB_CONFIG = {
   BASE_URL,
@@ -66,9 +50,7 @@ export const fetchMovies = async ({
 
   const response = await fetchWithTimeout(endpoint, {
     method: "GET",
-    headers: __DEV__
-      ? { accept: "application/json" } // Proxy handles auth
-      : TMDB_CONFIG.headers,
+    headers: TMDB_CONFIG.headers,
   });
 
   if (!response.ok) {
@@ -86,14 +68,12 @@ export const fetchMovies = async ({
 export const fetchMovieDetails = async (
   movieId: string,
 ): Promise<MovieDetails> => {
-  const detailUrl = __DEV__
-    ? `${TMDB_CONFIG.BASE_URL}/movie/${movieId}`
-    : `${TMDB_CONFIG.BASE_URL}/movie/${movieId}?api_key=${TMDB_CONFIG.API_KEY}`;
+  const detailUrl = `${TMDB_CONFIG.BASE_URL}/movie/${movieId}`;
 
   try {
     const response = await fetchWithTimeout(detailUrl, {
       method: "GET",
-      headers: __DEV__ ? { accept: "application/json" } : TMDB_CONFIG.headers,
+      headers: TMDB_CONFIG.headers,
     });
 
     if (!response.ok) {
